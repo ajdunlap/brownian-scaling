@@ -73,16 +73,6 @@
     }
 
     function go () {
-      //if (!SVG.supported) {
-        //document.getElementById('drawing-area').innerHTML = "<p>Error: Your browser does not appear to support SVG.</p>"
-        //return;
-      //}
-      
-      var N = 10;
-
-      var canvasWidth = 500;
-      var canvasHeight = 200;
-
       var BM = generate_BM(1000,0,100);
       ctx = initialize_canvas();
       function iter () {
@@ -92,29 +82,6 @@
         setTimeout(iter,20);
       }
       iter();
-      //draw_BM(ctx,BM);
-      //BM = zoom_BM(BM);
-      //draw_BM(ctx,BM);
-      function loop () {
-        l.remove();
-        BM = BM.slice(0,Math.ceil(BM.length/2));
-        //console.log(BM);
-        BM = double_BM_precision(BM);
-        //console.log(BM);
-        l = draw.polyline(BM).stroke('black').fill('white');
-        BM = stretch_BM(BM);
-        l.animate(duration,ease,delay).plot(BM).after(loop);
-      }
-      //loop();
-      return;
-    }
-
-    function cleanup () {
-      // remove any image from previous run, since this function is called
-      var children = document.getElementById('drawing-area').children;
-      for (var i = 0 ; i < children.length ; ++i) {
-        children[i].remove();
-      }
     }
 
     window.onload = go;
@@ -122,4 +89,4 @@
 
   <canvas id="drawing-area" width="800" height="300"></canvas>
   <hr />
-  <p><small>Source available on <a href="https://github.com/ajdunlap/brownzoom">GitHub</a>.
+  <p><small>Source available on <a href="https://github.com/ajdunlap/brsc">GitHub</a>.

@@ -21,6 +21,7 @@
       return rv*Math.sqrt(variance)/N+mean;
     }
 
+    // N should be a power of 2
     function generate_BM (N,variance) {
       var rv = [[0,0]];
       for (var i = 1 ; i < N ; ++i) {
@@ -35,7 +36,6 @@
         rv[2*i] = BM[i];
         rv[2*i+1] = [(BM[i][0]+BM[i+1][0])/2,normal((BM[i][1]+BM[i+1][1])/2,50*(BM[i+1][0]-BM[i][0])/2)];
       }
-      //console.log(rv.length);
       // FIXME: check that the length stays the same?
       return rv;
     }

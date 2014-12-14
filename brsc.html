@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <title>Brownian scaling</title>
+    <style>p { font-family: "Arial", "Liberation Sans", sans-serif; } #drawing-area { border: 1px solid blue; }</style>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <!-- <script type="text/javascript"
+            src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script> -->
+</head>
+<body>
+  <h1>
+    Brownian scaling
+  </h1>
+  <script>
+    function normal(mean,variance) {
+      var N = 6
+      var rv = 0;
+      for (var i = 0 ; i < N ; ++i) {
+        rv += 2*Math.random()-1;
+      }
+      return rv*Math.sqrt(variance)/N+mean;
+    }
+
+    function generate_BM (N,start,variance) {
+      var rv = [[0,start]];
+      for (var i = 1 ; i < N ; ++i) {
+        rv[i] = [i,normal(rv[i-1][1],variance)];
+      }
+      return rv;
+    }
+
+    function double_BM_precision (BM) {
+      var rv = [];
+      for (var i = 0 ; i < (BM.length+1)/2 ; ++i) {
+        rv[2*i] = BM[i];
+        rv[2*i+1] = [(BM[i][0]+BM[i+1][0])/2,normal((BM[i][1]+BM[i+1][1])/2,50*(BM[i+1][0]-BM[i][0])/2)];
+      }
+      //rv[2*BM.length-2] = BM[BM.length-1];
+      return rv;
+    }
+
+    function zoom_BM (BM) {
+      var eps = 0.01
+      rv = [];
+      for (var i = 0 ; i < BM.length ; ++i) {
+        rv[i] = [BM[i][0]*(1+eps),BM[i][1]*Math.sqrt(1+eps)]
+      }
+      if (BM[1][0] - BM[0][0] > 2) {
+        rv = double_BM_precision(rv);
+      }
+      return rv;
+    }
+    
+    function draw_BM (ctx,BM) {
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      for (var i = 0 ; i < BM.length ; ++i) {
+        ctx.lineTo(BM[i][0],BM[i][1]);
+      }
+      ctx.stroke();
+    }
+
+    function initialize_canvas () {
+      var canvas = document.getElementById('drawing-area');
+      //width = canvas.width;
+      height = canvas.height;
+      ctx = canvas.getContext('2d');
+      big_ctx = canvas.getContext('2d');
+      //canvas.width = canvas.width;
+      ctx.translate(0,height/2);
+      //ctx.scale(1,-1);
+      return ctx;
+    }
+
+    function go () {
+      //if (!SVG.supported) {
+        //document.getElementById('drawing-area').innerHTML = "<p>Error: Your browser does not appear to support SVG.</p>"
+        //return;
+      //}
+      
+      var N = 10;
+
+      var canvasWidth = 500;
+      var canvasHeight = 200;
+
+      var BM = generate_BM(1000,0,100);
+      ctx = initialize_canvas();
+      function iter () {
+        ctx.clearRect(0,-ctx.canvas.height/2,ctx.canvas.width,ctx.canvas.height);
+        draw_BM(ctx,BM);
+        BM = zoom_BM(BM);
+        setTimeout(iter,20);
+      }
+      iter();
+      //draw_BM(ctx,BM);
+      //BM = zoom_BM(BM);
+      //draw_BM(ctx,BM);
+      function loop () {
+        l.remove();
+        BM = BM.slice(0,Math.ceil(BM.length/2));
+        //console.log(BM);
+        BM = double_BM_precision(BM);
+        //console.log(BM);
+        l = draw.polyline(BM).stroke('black').fill('white');
+        BM = stretch_BM(BM);
+        l.animate(duration,ease,delay).plot(BM).after(loop);
+      }
+      //loop();
+      return;
+    }
+
+    function cleanup () {
+      // remove any image from previous run, since this function is called
+      var children = document.getElementById('drawing-area').children;
+      for (var i = 0 ; i < children.length ; ++i) {
+        children[i].remove();
+      }
+    }
+
+    window.onload = go;
+  </script>
+
+  <canvas id="drawing-area" width="800" height="300"></canvas>
+  <hr />
+  <p><small>Source available on <a href="https://github.com/ajdunlap/brownzoom">GitHub</a>.
